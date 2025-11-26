@@ -1,0 +1,52 @@
+[
+  {
+    "chinese": "个人投资者",
+    "english": "Individual Investor",
+    "abbreviation": "II"
+  },
+  {
+    "chinese": "企业客户",
+    "english": "Corporate Client",
+    "abbreviation": "CC"
+  },
+  {
+    "chinese": "机构投资者",
+    "english": "Institutional Investor",
+    "abbreviation": "INST"
+  },
+  {
+    "chinese": "高净值客户",
+    "english": "High Net Worth Client",
+    "abbreviation": "HNW"
+  },
+  {
+    "chinese": "零售客户",
+    "english": "Retail Client",
+    "abbreviation": "RC"
+  },
+  {
+    "chinese": "专业投资者",
+    "english": "Professional Investor",
+    "abbreviation": "PI"
+  },
+  {
+    "chinese": "政府机构",
+    "english": "Government Agency",
+    "abbreviation": "GA"
+  },
+  {
+    "chinese": "非营利组织",
+    "english": "Non-Profit Organization",
+    "abbreviation": "NPO"
+  },
+  {
+    "chinese": "金融机构",
+    "english": "Financial Institution",
+    "abbreviation": "FI"
+  },
+  {
+    "chinese": "中小企业",
+    "english": "Small and Medium Enterprise",
+    "abbreviation": "SME"
+  }
+]
