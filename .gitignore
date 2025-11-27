@@ -38,3 +38,6 @@ env/
 *.swp
 *.swo
 **.venv
+**backend.tar.gz
+data-fetcher/chromedriver**
+**/pdfs_files/**
