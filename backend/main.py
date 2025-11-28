@@ -11,6 +11,7 @@ from data_generator import save_data_to_json, read_data_from_json, industry_clas
 
 # 导入新的router
 from routers.company_recommendations import router as company_router
+from routers.pdf_metadata import router as pdf_metadata_router  # New import
 
 # 创建静态文件目录
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -134,6 +135,7 @@ async def root():
 
 # 注册公司推荐router - 在这里添加前缀
 app.include_router(company_router, prefix="/itcr-backend/api")
+app.include_router(pdf_metadata_router, prefix="/itcr-backend/api")  # New router registration
 
 if __name__ == "__main__":
     import uvicorn
