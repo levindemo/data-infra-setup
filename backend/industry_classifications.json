@@ -1,0 +1,52 @@
+[
+  {
+    "chinese": "科技",
+    "english": "Technology",
+    "abbreviation": "TECH"
+  },
+  {
+    "chinese": "金融",
+    "english": "Finance",
+    "abbreviation": "FIN"
+  },
+  {
+    "chinese": "医疗健康",
+    "english": "Healthcare",
+    "abbreviation": "HC"
+  },
+  {
+    "chinese": "消费品",
+    "english": "Consumer Goods",
+    "abbreviation": "CG"
+  },
+  {
+    "chinese": "工业",
+    "english": "Industry",
+    "abbreviation": "IND"
+  },
+  {
+    "chinese": "能源",
+    "english": "Energy",
+    "abbreviation": "ENE"
+  },
+  {
+    "chinese": "房地产",
+    "english": "Real Estate",
+    "abbreviation": "RE"
+  },
+  {
+    "chinese": "通信",
+    "english": "Telecommunications",
+    "abbreviation": "TEL"
+  },
+  {
+    "chinese": "原材料",
+    "english": "Materials",
+    "abbreviation": "MAT"
+  },
+  {
+    "chinese": "公用事业",
+    "english": "Utilities",
+    "abbreviation": "UTIL"
+  }
+]

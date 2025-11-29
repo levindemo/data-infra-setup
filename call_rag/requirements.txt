@@ -1,0 +1,8 @@
+python-dotenv
+dashscope
+# gptpdf # hard to get this python module
+openai
+# docx
+python-docx
+fastapi
+uvicorn[standard]

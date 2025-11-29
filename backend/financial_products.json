@@ -1,0 +1,52 @@
+[
+  {
+    "chinese": "外汇",
+    "english": "Foreign Exchange",
+    "abbreviation": "FX"
+  },
+  {
+    "chinese": "黄金",
+    "english": "Gold",
+    "abbreviation": "GLD"
+  },
+  {
+    "chinese": "白银",
+    "english": "Silver",
+    "abbreviation": "SLV"
+  },
+  {
+    "chinese": "股票",
+    "english": "Stocks",
+    "abbreviation": "STK"
+  },
+  {
+    "chinese": "债券",
+    "english": "Bonds",
+    "abbreviation": "BND"
+  },
+  {
+    "chinese": "期货",
+    "english": "Futures",
+    "abbreviation": "FUT"
+  },
+  {
+    "chinese": "期权",
+    "english": "Options",
+    "abbreviation": "OPT"
+  },
+  {
+    "chinese": "基金",
+    "english": "Funds",
+    "abbreviation": "FND"
+  },
+  {
+    "chinese": "ETF",
+    "english": "Exchange Traded Fund",
+    "abbreviation": "ETF"
+  },
+  {
+    "chinese": "数字货币",
+    "english": "Digital Currency",
+    "abbreviation": "DCY"
+  }
+]

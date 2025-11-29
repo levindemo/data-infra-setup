@@ -1,0 +1,3 @@
+#pip install 
+pdfplumber
+mysql-connector-python
