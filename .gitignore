@@ -41,3 +41,4 @@ env/
 **backend.tar.gz
 data-fetcher/chromedriver**
 **/pdfs_files/**
+**.tar.gz
