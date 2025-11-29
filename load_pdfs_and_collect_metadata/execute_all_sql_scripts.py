@@ -96,7 +96,7 @@ class SQLLoader:
             return False
     
     def execute_sql_file(self, sql_file_path):
-        """执行SQL文件，遇到错误立即停止"""
+        """执行SQL文件，增强错误处理和验证"""
         print(f"\n正在执行SQL文件: {sql_file_path}")
         
         # 检查文件是否存在
@@ -140,27 +140,75 @@ class SQLLoader:
             if current_statement.strip():
                 sql_statements.append(current_statement.strip())
             
+            #遍历所有语句，并把每个语句前面的注释部分去掉用换行符和注释标来查找切割
+            for i, statement in enumerate(sql_statements):
+                # 去掉注释部分
+                statement = re.sub(r'--.*$', '', statement, flags=re.MULTILINE)
+                statement = re.sub(r'/\*.*?\*/', '', statement, flags=re.DOTALL)
+                sql_statements[i] = statement.strip()
+            
             print(f"文件中包含 {len(sql_statements)} 条SQL语句")
+            #打印前三条
+            print(f"前三条语句: {sql_statements[:3]}")
             
             # 逐条执行SQL语句
             for i, statement in enumerate(sql_statements, 1):
                 # 跳过空语句和注释
-                if not statement or statement.startswith('--'):
+                if not statement or statement.strip().startswith('--'):
+                    print(f"跳过空语句或注释行")
                     continue
                 
+                #打印剩下的语句，前三条
+                print(f"剩余语句 {i}/{len(sql_statements)}: {statement[:100]}...")
+                
+                # 检查是否是CREATE TABLE语句
+                is_create_table = statement.strip().upper().startswith('CREATE TABLE')
+                #
                 print(f"正在执行语句 {i}/{len(sql_statements)}")
                 try:
-                    # 显示部分SQL用于调试
-                    display_sql = statement[:100] + "..." if len(statement) > 100 else statement
-                    print(f"SQL: {display_sql}")
+                    # 显示完整的SQL用于调试
+                    print(f"执行SQL: {statement}")
+                    
+                    #避开select查询返回错误信息: Unread result found
+                    if statement.strip().upper().startswith('SELECT'):
+                        ####
+                        continue
                     
                     self.cursor.execute(statement)
                     self.conn.commit()
                     print(f"语句 {i} 执行成功")
+                    
+                    # 如果是CREATE TABLE语句，立即验证表是否创建成功
+                    if is_create_table:
+                        print(f"正在验证表创建结果...")
+                        if not self.check_table_exists():
+                            print("警告: 表创建语句执行成功，但表不存在，可能存在语法问题！")
+                            # 尝试从错误中提取更多信息
+                            try:
+                                self.cursor.execute(f"SHOW WARNINGS")
+                                warnings = self.cursor.fetchall()
+                                if warnings:
+                                    print("SQL警告信息:")
+                                    for w in warnings:
+                                        print(f"  {w}")
+                            except:
+                                pass
+                            return False
+                    
                 except Exception as e:
                     print(f"错误: 语句 {i} 执行失败")
-                    print(f"失败的SQL: {display_sql}")
+                    print(f"失败的SQL: {statement}")  # 显示完整的失败SQL
                     print(f"错误信息: {e}")
+                    # 尝试获取更多错误信息
+                    try:
+                        self.cursor.execute("SHOW WARNINGS")
+                        warnings = self.cursor.fetchall()
+                        if warnings:
+                            print("SQL警告信息:")
+                            for w in warnings:
+                                print(f"  {w}")
+                    except:
+                        pass
                     # 遇到错误立即停止
                     return False
             
@@ -228,23 +276,31 @@ def main():
             print("删除表失败，程序终止")
             return
         
-        # 3. 执行所有SQL文件
-        # 先执行第一个文件再查看表是否建好
-        if not loader.execute_sql_file(sql_files[0]):
-            print(f"执行DDL文件 {sql_files[0]} 失败，程序终止")
+        # 3. 先执行创建表的脚本
+        print(f"\n====== 处理创建表脚本 ======")
+        create_table_script = sql_files[0]
+        if not loader.execute_sql_file(create_table_script):
+            print(f"执行创建表脚本 {create_table_script} 失败，程序终止")
             return
-        # 4. 检查表是否创建成功
+        
+        # 4. 验证表是否真的创建成功
         if not loader.check_table_exists():
-            print("表创建失败，程序终止")
+            print("表创建验证失败，程序终止")
             return
-        # 执行其他文件
+        
+        # 5. 执行后续的数据导入脚本
         for i, sql_file in enumerate(sql_files[1:], 1):
-            print(f"\n====== 处理文件 {i}/{len(sql_files[1:])} ======")
+            # 检查文件是否存在，如果不存在则跳过
+            if not os.path.exists(sql_file):
+                print(f"警告: 文件 {sql_file} 不存在，跳过")
+                continue
+                
+            print(f"\n====== 处理数据文件 {i}/{len(sql_files)-1} ======")
             if not loader.execute_sql_file(sql_file):
                 print(f"执行文件 {sql_file} 失败，程序终止")
                 return
         
-        # 5. 统计记录数
+        # 6. 统计记录数
         loader.count_records()
         
         print("\n🎉 所有SQL文件执行完成！")

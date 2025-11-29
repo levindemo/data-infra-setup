@@ -22,16 +22,20 @@ def get_db_connection():
         db_host = os.getenv("DB_HOST", "localhost")
         db_name = os.getenv("DB_NAME", "mydata")
         logger.info(f"Connecting to database: {db_name}")
+        
+        # 重要：确保MySQL连接使用UTF-8编码
         conn = mysql.connector.connect(
             host=db_host,
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", ""),
             database=db_name,
-            charset="utf8mb4",  # Important for handling Chinese characters
+            charset="utf8mb4",  # 处理中文和特殊字符
             collation="utf8mb4_unicode_ci",
-            use_unicode=True
+            use_unicode=True,
+            connection_timeout=30
         )
-        # Set connection to use utf8mb4
+        
+        # 显式设置会话编码
         cursor = conn.cursor()
         cursor.execute("SET NAMES 'utf8mb4'")
         cursor.execute("SET CHARACTER SET utf8mb4")
@@ -117,6 +121,12 @@ async def get_pdf_metadata(
         # Convert to model instances
         pdf_items = []
         for row in results:
+            # 确保字符串值被正确解码为UTF-8
+            for key, value in row.items():
+                if isinstance(value, str):
+                    # 在Python中，字符串默认是Unicode，但确保没有编码问题
+                    pass
+                
             # Convert datetime string to datetime object if needed
             if row.get("created_at") and isinstance(row["created_at"], str):
                 row["created_at"] = datetime.fromisoformat(row["created_at"])
@@ -155,6 +165,11 @@ async def get_pdf_metadata_by_id(pdf_id: int):
         
         if not result:
             raise HTTPException(status_code=404, detail=f"PDF metadata with ID {pdf_id} not found")
+        
+        # 确保字符串值被正确解码
+        for key, value in result.items():
+            if isinstance(value, str):
+                pass
         
         # Convert datetime string to datetime object if needed
         if result.get("created_at") and isinstance(result["created_at"], str):

@@ -5,3 +5,5 @@ python-dotenv
 requests
 dashscope
 mysql-connector-python
+pymysql
+tqdm
