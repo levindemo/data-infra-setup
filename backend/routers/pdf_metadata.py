@@ -5,23 +5,41 @@ from datetime import datetime
 import mysql.connector
 import os
 from dotenv import load_dotenv
+import logging
 
 # Load environment variables
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/itcr-backend/api", tags=["pdf-metadata"])
 
-# Database connection function
+# Database connection function with UTF-8 encoding support
 def get_db_connection():
     try:
+        db_host = os.getenv("DB_HOST", "localhost")
+        db_name = os.getenv("DB_NAME", "mydata")
+        logger.info(f"Connecting to database: {db_name}")
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "localhost"),
+            host=db_host,
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", ""),
-            database=os.getenv("DB_NAME", "pdf_metadata_db")
+            database=db_name,
+            charset="utf8mb4",  # Important for handling Chinese characters
+            collation="utf8mb4_unicode_ci",
+            use_unicode=True
         )
+        # Set connection to use utf8mb4
+        cursor = conn.cursor()
+        cursor.execute("SET NAMES 'utf8mb4'")
+        cursor.execute("SET CHARACTER SET utf8mb4")
+        cursor.execute("SET collation_connection = 'utf8mb4_unicode_ci'")
+        cursor.close()
         return conn
     except Exception as e:
+        logger.error(f"Database connection error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
 
 # PDF Metadata Model - matches the database table
@@ -63,8 +81,8 @@ async def get_pdf_metadata(
         cursor = conn.cursor(dictionary=True)
         
         # Build the base query
-        base_query = "SELECT * FROM pdf_metadata"
-        count_query = "SELECT COUNT(*) as count FROM pdf_metadata"
+        base_query = "SELECT * FROM mydata.pdf_metadata"
+        count_query = "SELECT COUNT(*) as count FROM mydata.pdf_metadata"
         conditions = []
         params = []
         
@@ -113,6 +131,7 @@ async def get_pdf_metadata(
         )
     
     except Exception as e:
+        logger.error(f"Database query error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database query error: {str(e)}")
     finally:
         if conn:
@@ -130,7 +149,7 @@ async def get_pdf_metadata_by_id(pdf_id: int):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        query = "SELECT * FROM pdf_metadata WHERE id = %s"
+        query = "SELECT * FROM mydata.pdf_metadata WHERE id = %s"
         cursor.execute(query, (pdf_id,))
         result = cursor.fetchone()
         
@@ -146,6 +165,7 @@ async def get_pdf_metadata_by_id(pdf_id: int):
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Database query error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Database query error: {str(e)}")
     finally:
         if conn:
